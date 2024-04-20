@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Enlace a Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Últimos datos</h1>
+        <div class="container">
+            <h2 class="text-center">HELTEC</h2>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Temperatura Heltec</h5>
+                <p class="card-text"><span id="temperatura"></span> °C</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Presión Heltec</h5>
+                <p class="card-text"><span id="presion"></span> hPa</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">rssi Heltec</h5>
+                <p class="card-text"><span id="rssi"></span></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">snr Heltec</h5>
+                <p class="card-text"><span id="snr"></span></p>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="text-center">TTGO</h2>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Missatge TTGO</h5>
+                <p class="card-text"><span id="missatge"></span></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">rssi TTGO</h5>
+                <p class="card-text"><span id="rssi-ttgo"></span></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">snr TTGO</h5>
+                <p class="card-text"><span id="snr-ttgo"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define una función para realizar el fetch y actualizar el valor de la temperatura
+        function fetchDataAndUpdate() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Obtén el valor de la temperatura del objeto JSON recibido
+                    const temperatura = data.result.uplink_message.decoded_payload.temperatura_C;
+                    const pressió = data.result.uplink_message.decoded_payload.presion_hPa;
+                    const rssi = data.result.uplink_message.rx_metadata[0].rssi;
+                    const snr = data.result.uplink_message.rx_metadata[0].snr;
+                    // Solo para mostrar un valor estático, puedes obtenerlo del JSON si es necesario
+
+                    // Actualiza el contenido del elemento span con el valor de la temperatura
+                    document.getElementById('temperatura').innerText = temperatura;
+                    document.getElementById('presion').innerText = pressió;
+                    document.getElementById('rssi').innerText = rssi;
+                    document.getElementById('snr').innerText = snr;
+
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        function fetchDataAndUpdateTtgo() {
+            fetch('/data-ttgo')
+                .then(response => response.json())
+                .then(data => {
+                    // Obtén el valor de la temperatura del objeto JSON recibido
+                    const missatge = data.result.uplink_message.decoded_payload.dades;
+                    const rssiTtgo = data.result.uplink_message.rx_metadata[0].rssi;
+                    const snrTtgo = data.result.uplink_message.rx_metadata[0].snr;
+                    // Solo para mostrar un valor estático, puedes obtenerlo del JSON si es necesario
+
+                    // Actualiza el contenido del elemento span con el valor de la temperatura
+                    document.getElementById('missatge').innerText = missatge;
+                    document.getElementById('rssi-ttgo').innerText = rssiTtgo;
+                    document.getElementById('snr-ttgo').innerText = snrTtgo;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Llama a la función fetchDataAndUpdate cada 5 segundos
+        setInterval(fetchDataAndUpdate, 5000);
+        setInterval(fetchDataAndUpdateTtgo, 5000);
+
+        // Ejecuta la función por primera vez al cargar la página
+        fetchDataAndUpdate();
+        fetchDataAndUpdateTtgo();
+    </script>
+</body>
+</html>
